@@ -1,9 +1,9 @@
 # Repo-level rulesets work on all GitHub plans.
 resource "github_repository_ruleset" "protect_main" {
-  for_each = github_repository.this
+  for_each = { for k, v in github_repository.this : k => v.name }
 
   name        = "protect-main"
-  repository  = each.value.name
+  repository  = each.value
   target      = "branch"
   enforcement = "active"
 
