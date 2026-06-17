@@ -25,10 +25,45 @@ The structural difference: on enterprise, the **org itself is provisioned by IaC
 | `providers.tf` | GitHub provider config — `base_url` null = github.com, set for GHE |
 | `variables.tf` | All inputs; enterprise vars default to null |
 | `org.tf` | `github_organization_settings` — works on all plans |
-| `repos.tf` | Two demo public repos via `for_each` over `local.repos` |
-| `rulesets.tf` | Repo-level rulesets (all plans) + org-level ruleset (all plans); comments note enterprise policy tier above org |
-| `vuln.tf` | Vulnerability alerts per repo — free for public repos; private requires Advanced Security |
+| `repos.tf` | `local.repos` map + `module.repo` for_each — single source of truth for all repos |
+| `rulesets.tf` | Org-level ruleset (all plans); comments note enterprise policy tier above org |
 | `enterprise.tf` | `data.github_enterprise` + `github_enterprise_organization` — both gated on `enterprise_slug` |
+| `modules/repo/` | Paved-path module: repo + branch protection ruleset + vulnerability alerts |
+
+## Adding a new repository
+
+Edit `local.repos` in `repos.tf`:
+
+```hcl
+locals {
+  repos = {
+    my-new-repo = {
+      description = "What this repo does"
+      topics      = ["relevant", "topics"]
+    }
+  }
+}
+```
+
+That's it. Branch protection and vulnerability alerts are applied automatically.
+
+For non-default settings, use the module directly:
+
+```hcl
+module "repo" {
+  source   = "./modules/repo"
+  for_each = local.repos
+
+  name                            = each.key
+  description                     = each.value.description
+  topics                          = each.value.topics
+  visibility                      = "private"
+  required_approving_review_count = 2
+  vulnerability_alerts            = false
+}
+```
+
+See `modules/repo/variables.tf` for all options.
 
 ## Plan requirements by resource
 
@@ -60,4 +95,5 @@ For enterprise, also set `github_base_url`, `enterprise_slug`, and `enterprise_a
 - New resource types go in their own `.tf` file named after the resource category.
 - Enterprise-gated blocks use `count = var.enterprise_slug != null ? 1 : 0` consistently.
 - Comments on enterprise-only behavior explain *what* differs and *why* (license requirement, policy tier, etc.) — not just that it's unavailable.
-- `local.repos` in `repos.tf` is the single source of truth for demo repo names; `rulesets.tf` and `vuln.tf` reference `github_repository.this` via `for_each`.
+- `local.repos` in `repos.tf` is the single source of truth for repo names; all per-repo resources live inside `modules/repo/`.
+- New per-repo resources belong in `modules/repo/main.tf`, not at root level.
