@@ -2,3 +2,13 @@
 .envrc
 .direnv/
 bin/
+
+# Tofu/Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!terraform.tfvars.example
+crash.log
+override.tf
+override.tf.json

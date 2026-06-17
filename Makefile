@@ -1,3 +1,18 @@
+TOFU      ?= tofu
+TERRAFORM ?= $(TOFU)
+
+init:
+	$(TERRAFORM) init
+
+plan:
+	$(TERRAFORM) plan
+
+apply:
+	$(TERRAFORM) apply
+
+destroy:
+	$(TERRAFORM) destroy
+
 build:
 	nix build .#
 

@@ -1,0 +1,5 @@
+github_base_url   = "https://github.example.com/api/v3/"
+github_token      = "ghp_..."
+github_owner      = "my-org"
+enterprise_slug   = "my-enterprise"
+org_billing_email = "admin@example.com"
