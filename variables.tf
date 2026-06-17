@@ -1,6 +1,9 @@
 variable "github_base_url" {
   type        = string
-  description = "GHE API base URL, e.g. https://github.example.com/api/v3/"
+  default     = null
+  # GHE only: set to https://github.example.com/api/v3/
+  # Leave null for github.com.
+  description = "GHE API base URL. Null uses github.com."
 }
 
 variable "github_token" {
@@ -14,11 +17,21 @@ variable "github_owner" {
 }
 
 variable "enterprise_slug" {
-  type        = string
-  description = "Enterprise slug shown in GHE admin (Settings > Enterprise overview)"
+  type    = string
+  default = null
+  # GHE / Enterprise Cloud only: slug from Settings > Enterprise overview.
+  # Leave null for github.com free/team orgs.
+  description = "Enterprise slug. Null disables enterprise-scoped resources."
 }
 
 variable "org_billing_email" {
   type        = string
   description = "Billing contact email for the organization"
+}
+
+variable "enterprise_admin_login" {
+  type    = string
+  default = null
+  # Required when enterprise_slug is set — must be an existing GitHub user.
+  description = "GitHub username to assign as org admin on enterprise-provisioned orgs."
 }

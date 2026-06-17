@@ -1,11 +1,11 @@
 TOFU      ?= tofu
 TERRAFORM ?= $(TOFU)
 
-init:
-	$(TERRAFORM) init
-
 plan:
 	$(TERRAFORM) plan
+
+init:
+	$(TERRAFORM) init
 
 apply:
 	$(TERRAFORM) apply
